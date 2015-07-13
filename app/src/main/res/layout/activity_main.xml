@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:background="#ffffffff">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:layout_gravity="center_horizontal"
+        android:weightSum="1"
+        android:background="#ddd"
+        android:id="@+id/linearLayout">
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="54dp"
+            android:id="@+id/searchField"
+            android:layout_weight="0.98"
+            android:autoText="false"
+            android:textColor="#ff303030"
+            android:background="#ddd"
+            android:theme="@style/AlertDialog.AppCompat.Light"
+            android:enabled="true"
+            android:inputType="text"
+            android:paddingLeft="20dp"
+            android:onClick="clearField"
+            android:layout_gravity="center"
+            android:hint="Find repositories..." />
+
+        <ImageButton
+            android:src="@drawable/search_logo"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:scaleType="fitCenter"
+            android:text="Go"
+            android:onClick="searchAndDisplay"
+            android:id="@+id/searchButton"
+            android:padding="12dp"
+            android:layout_margin="0dp"
+            android:textStyle="bold"
+            android:textColor="#fff"
+            android:background = "@drawable/roundedbutton"
+            android:layout_gravity="center"
+            android:contentDescription="SearchButton" />
+
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/mainListView"
+        android:layout_width="fill_parent"
+        android:layout_height="453dp"
+        android:choiceMode="none"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/linearLayout" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:text="Show commits"
+        android:id="@+id/showButton"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="15dp"
+        android:background = "@drawable/roundedbutton"
+        android:padding="5dp"
+        android:textColor="#FFF"
+        android:textStyle="bold"
+        android:onClick="startCommitActivity"
+        android:visibility="gone" />
+
+</RelativeLayout>
