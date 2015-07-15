@@ -1,4 +1,4 @@
-# Streamdata-android/gitHubClient
+# Streamdata-android/github-android
 This android application shows how to use the <a href="http://streamdata.io" target="_blank">streamdata.io</a> proxy in a sample app.
 
 Streamdata.io allows to get data pushed from various sources and use them in your application.
