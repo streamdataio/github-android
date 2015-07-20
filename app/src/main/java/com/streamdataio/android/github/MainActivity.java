@@ -118,8 +118,22 @@ public class MainActivity extends Activity {
                         showButton.setVisibility(View.GONE);
                     }
                 }
+
+
+                EditText searchField = (EditText) findViewById(R.id.searchField);
+                searchField.setOnClickListener(new android.widget.AdapterView.OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        MainActivity.this.clearField(v);
+                    }
+                });
             }
         });
+
+
+
+
 
         // Authenticating by GitHub Java SDK
         GitHubClient client = new GitHubClient();
@@ -138,7 +152,7 @@ public class MainActivity extends Activity {
     }
 
     // Clears search text field on focussing it
-    public void clearField(View v) {
+    public void clearField(final View view) {
         EditText editText = (EditText) findViewById(R.id.searchField);
         editText.setText("");
     }
@@ -228,4 +242,6 @@ public class MainActivity extends Activity {
             }
         });
     }
+
+
 }

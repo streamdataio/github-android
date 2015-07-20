@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="concurrent_repositories">5</integer>
-    <string name="github_api_token">YOUR_GITHUB_API_TOKEN_HERE</string>
+    <string name="github_api_token">510f6f020d4dd090b964c76000daf1d52167798f</string>
     <string name="streamdata_proxy_prefix">https://streamdata.motwin.net/</string>
-    <string name="streamdata_app_token">YOUR_STREAMDATAIO_TOKEN_HERE</string>
+    <string name="streamdata_app_token">MDM3MzM3OTQtMWRmZC00MTg1LWI2YzEtMGFmYWE1MjlhMmQ3</string>
     <string name="history_filename">searches_history.json</string>
 </resources>
