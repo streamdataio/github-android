@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -41,7 +42,6 @@ public class MainActivity extends Activity {
     public ArrayList<String> liste, selectedItems;
     SearchHistoryManager history;
 
-
     /**
      * Android activity creation handler
      * @param savedInstanceState
@@ -59,7 +59,7 @@ public class MainActivity extends Activity {
         history = new SearchHistoryManager(this);
 
         MAX_CONCURRENT_REPOS = getResources().getInteger(R.integer.concurrent_repositories);
-                gitHubApiToken = String.valueOf(getResources().getText(R.string.github_api_token));
+        gitHubApiToken = String.valueOf(getResources().getText(R.string.github_api_token));
 
         // Getting UI Objects
         showButton = (Button) findViewById(R.id.showButton);
@@ -119,7 +119,6 @@ public class MainActivity extends Activity {
                     }
                 }
 
-
                 EditText searchField = (EditText) findViewById(R.id.searchField);
                 searchField.setOnClickListener(new android.widget.AdapterView.OnClickListener() {
 
@@ -130,10 +129,6 @@ public class MainActivity extends Activity {
                 });
             }
         });
-
-
-
-
 
         // Authenticating by GitHub Java SDK
         GitHubClient client = new GitHubClient();

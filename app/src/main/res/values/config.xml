@@ -3,6 +3,6 @@
     <integer name="concurrent_repositories">5</integer>
     <string name="github_api_token">YOUR_GITHUB_API_TOKEN_HERE</string>
     <string name="streamdata_proxy_prefix">https://streamdata.motwin.net/</string>
-    <string name="streamdata_app_token">YOUR_STREAMDATAIO_TOKEN_HERE</string>
+    <string name="streamdata_app_token">YOUR_STREAMDATA_APP_TOKEN_HERE</string>
     <string name="history_filename">searches_history.json</string>
 </resources>

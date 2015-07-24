@@ -1,10 +1,12 @@
 package com.streamdataio.android.github;
 
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -60,7 +62,6 @@ public class CommitsActivity extends Activity {
 
     // Map of EventSource foreach repo: (repositoriesID, EventSource)
     private ConcurrentHashMap<String, EventSource> reposEventSources = new ConcurrentHashMap<>();
-    //private HashMap<String, SSEHandler> ownSSEHandler = new HashMap<>();
 
     private ListView listView;
     private MyListAdapter adapter;
@@ -133,7 +134,7 @@ public class CommitsActivity extends Activity {
 
         // Create the EventSource with API URL & Streamdata.io authentication token
         try {
-            SSEHandler sseHandler = new SSEHandler();
+            SSEHandler sseHandler = new SSEHandler(api);
 
             //ownSSEHandler.put(api, sseHandler);
             reposEventSources.put(api, new EventSource(new URI(sseUrl), sseHandler, headers));
@@ -183,8 +184,13 @@ public class CommitsActivity extends Activity {
     private class SSEHandler implements EventSourceHandler {
 
         private JsonNode ownData;
+        private String repoName;
 
         public SSEHandler() {
+        }
+        public SSEHandler(String repoName) {
+            this();
+            this.repoName = repoName;
         }
 
         /**
@@ -209,17 +215,23 @@ public class CommitsActivity extends Activity {
                 // SSE message is a snapshot
                 ownData = mapper.readTree(message.data);
 
+                System.out.println("SIZE DATA : "+message.data.length());
+
                 // Update commits array
                 updateCommits();
 
             } else if ("patch".equals(event)) {
                 // SSE message is a patch
-                System.out.println(message.data.toString());
-
                 try {
                     JsonNode patchNode = mapper.readTree(message.data);
                     JsonPatch patch = JsonPatch.fromJson(patchNode);
                     ownData = patch.apply(ownData);
+
+                    // Get the concerned repository name
+                    String commitMessage =  ownData.get(0).path("commit").path("message").textValue();
+
+                    // Spawning an Android notification
+                    createNotification("New Commit: "+repoName.substring(repoName.indexOf("/")+1),  commitMessage);
 
                     // Update commits array
                     updateCommits();
@@ -230,6 +242,25 @@ public class CommitsActivity extends Activity {
                 Log.d("Debug", "Disconnecting : " + message.toString());
                 throw new RuntimeException("Wrong SSE message!");
             }
+        }
+
+        private final void createNotification(String title, String text) {
+
+            NotificationCompat.Builder mBuilder =
+                    new NotificationCompat.Builder(CommitsActivity.this)
+                            .setSmallIcon(R.drawable.icon)
+                            .setContentTitle(title)
+                            .setContentText(text);
+
+            // Sets an ID for the notification
+            Random rand = new Random();
+            int mNotificationId = rand.nextInt(51);
+
+            // Gets an instance of the NotificationManager service
+            NotificationManager mNotifyMgr =
+                    (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            // Builds the notification and issues it.
+            mNotifyMgr.notify(mNotificationId, mBuilder.build());
         }
 
         /**
@@ -260,6 +291,7 @@ public class CommitsActivity extends Activity {
 
         /**
          * Return commits of ONE repository, depending on its EventSource, as a JsonNode
+         *
          * @return
          */
         public JsonNode getOwnData() {
@@ -276,9 +308,8 @@ public class CommitsActivity extends Activity {
 
         // foreach EventSource Handler ...
         for (Map.Entry<String, EventSource> entry : reposEventSources.entrySet()) {
-            SSEHandler sseHandler = (SSEHandler)  entry.getValue().getEventSourceHandler();
+            SSEHandler sseHandler = (SSEHandler) entry.getValue().getEventSourceHandler();
             JsonNode data = sseHandler.getOwnData();
-
 
             // Reconstructs commits array from JSON data
             for (Iterator<JsonNode> iterator = data.iterator(); iterator.hasNext(); ) {
