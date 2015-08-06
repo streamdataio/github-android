@@ -1,0 +1,15 @@
+<resources>
+    <string name="title_activity_login">GitHub Authentication</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email / Login</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in to GitHub</string>
+    <string name="action_public_version">Public version</string>
+    <string name="action_sign_in_short">Sign in</string>
+
+    <string name="error_invalid_email">Wrong Login / Email</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+</resources>

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
@@ -73,15 +74,27 @@ public class CommitsActivity extends Activity {
 
 
     /* ************** Android Activity states handlers **************** */
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_commits);
         Intent intent = getIntent();
 
+        // Get GitHub API token from SharedPreferences
+        SharedPreferences sharedPref = getSharedPreferences("SharedPreferences", Context.MODE_PRIVATE);
+        String defaultGithubToken = "";
+        gitHubApiToken = sharedPref.getString("gitHubApiToken", defaultGithubToken);
+
+        // If the user is not gitHub-authenticated --> start LoginActivity
+        if (gitHubApiToken.isEmpty()) {
+            startLoginActivity();
+        }
+
         // Get the array of Repositories-ID as Strings
         reposIdArray = intent.getStringArrayListExtra("reposId");
+        //gitHubApiToken = intent.getStringExtra("gitHubApiToken");
+
+        System.out.println("[CommitsActivity] gitHubApiToken = '" + gitHubApiToken + "'");
 
         // Generate a random color & eventsource foreach repository
         for (int i = 0; i < reposIdArray.size(); i++) {
@@ -91,7 +104,8 @@ public class CommitsActivity extends Activity {
         // Getting configuration values from res/values/config.xml
         streamdataioAppToken = String.valueOf(getResources().getText(R.string.streamdata_app_token));
         streamdataioProxyPrefix = String.valueOf(getResources().getText(R.string.streamdata_proxy_prefix));
-        gitHubApiToken = String.valueOf(getResources().getText(R.string.github_api_token));
+        //gitHubApiToken = String.valueOf(getResources().getText(R.string.github_api_token));
+
 
         listView = (ListView) findViewById(R.id.listView);
         adapter = new MyListAdapter(this, commits);
@@ -124,20 +138,21 @@ public class CommitsActivity extends Activity {
      */
     private void connect(String api) {
 
-        // Add the GitHub API token with a URL parameter (only way to authenticate)
-        myApi = "https://api.github.com/repos/" + api + "/commits?access_token=" + gitHubApiToken;
+        //remove the private-repo-lock character if exists
+        String clearApi = api.startsWith("\uD83D\uDD12") ? api.substring(2) :api;
+
+        // Add the GitHub API token with an URL parameter (only way to authenticate)
+        //myApi = "https://api.github.com/repos/" + api + "/commits?X-Sd-Token="+streamdataioAppToken+"&access_token=" + gitHubApiToken;
+        myApi = "https://api.github.com/repos/" + clearApi + "/commits?access_token=" + gitHubApiToken;
 
         // Add the Streamdata.io authentication token
         Map<String, String> headers = new HashMap<String, String>();
         headers.put("X-Sd-Token", streamdataioAppToken);
-        String sseUrl = streamdataioProxyPrefix + myApi;
 
         // Create the EventSource with API URL & Streamdata.io authentication token
         try {
             SSEHandler sseHandler = new SSEHandler(api);
-
-            //ownSSEHandler.put(api, sseHandler);
-            reposEventSources.put(api, new EventSource(new URI(sseUrl), sseHandler, headers));
+            reposEventSources.put(api, new EventSource(new URI(streamdataioProxyPrefix), new URI(myApi), sseHandler, headers));
 
         } catch (URISyntaxException e) {
             e.printStackTrace();
@@ -188,6 +203,7 @@ public class CommitsActivity extends Activity {
 
         public SSEHandler() {
         }
+
         public SSEHandler(String repoName) {
             this();
             this.repoName = repoName;
@@ -215,7 +231,7 @@ public class CommitsActivity extends Activity {
                 // SSE message is a snapshot
                 ownData = mapper.readTree(message.data);
 
-                System.out.println("SIZE DATA : "+message.data.length());
+                System.out.println("SIZE DATA : " + message.data.length());
 
                 // Update commits array
                 updateCommits();
@@ -223,15 +239,17 @@ public class CommitsActivity extends Activity {
             } else if ("patch".equals(event)) {
                 // SSE message is a patch
                 try {
+                    System.out.println("SIZE PATCH : " + message.data.length());
+
                     JsonNode patchNode = mapper.readTree(message.data);
                     JsonPatch patch = JsonPatch.fromJson(patchNode);
                     ownData = patch.apply(ownData);
 
                     // Get the concerned repository name
-                    String commitMessage =  ownData.get(0).path("commit").path("message").textValue();
+                    String commitMessage = ownData.get(0).path("commit").path("message").textValue();
 
                     // Spawning an Android notification
-                    createNotification("New Commit: "+repoName.substring(repoName.indexOf("/")+1),  commitMessage);
+                    createNotification("New Commit: " + repoName.substring(repoName.indexOf("/") + 1), commitMessage);
 
                     // Update commits array
                     updateCommits();
@@ -240,6 +258,13 @@ public class CommitsActivity extends Activity {
                 }
             } else {
                 Log.d("Debug", "Disconnecting : " + message.toString());
+
+                if (message.data.contains("HTTP/1.1 401 Unauthorized")) {
+                    // GitHub api token may be out-of-date --> restart oauth procedure
+                    SharedPreferences settings = getSharedPreferences("SharedPreferences", Context.MODE_PRIVATE);
+                    settings.edit().clear().commit();
+                    startLoginActivity();
+                }
                 throw new RuntimeException("Wrong SSE message!");
             }
         }
@@ -257,8 +282,7 @@ public class CommitsActivity extends Activity {
             int mNotificationId = rand.nextInt(51);
 
             // Gets an instance of the NotificationManager service
-            NotificationManager mNotifyMgr =
-                    (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             // Builds the notification and issues it.
             mNotifyMgr.notify(mNotificationId, mBuilder.build());
         }
@@ -466,4 +490,8 @@ public class CommitsActivity extends Activity {
         }
     }
 
+    private void startLoginActivity() {
+        Intent inte = new Intent(this, LoginActivity.class);
+        startActivity(inte);
+    }
 }

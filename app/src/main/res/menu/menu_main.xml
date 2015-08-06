@@ -2,7 +2,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.streamdataio.android.github.MainActivity">
+
     <item android:id="@+id/action_clear_history" android:title="Clear history"
         android:orderInCategory="50" app:showAsAction="never" android:onClick="clearHistory" />
+
+    <item android:id="@+id/action_signin" android:title="Sign in"
+        android:orderInCategory="50" app:showAsAction="ifRoom" android:onClick="signIn" />
+
+    <item android:id="@+id/action_signout" android:title="Sign out"
+        android:orderInCategory="50" app:showAsAction="ifRoom" android:onClick="signOut" />
 
 </menu>

@@ -1,8 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Maximum number of concurrent-listenable-repositories -->
     <integer name="concurrent_repositories">5</integer>
-    <string name="github_api_token">YOUR_GITHUB_API_TOKEN_HERE</string>
+
+    <!-- URI of the Streamdata.io proxy prefix (must finish with /) -->
     <string name="streamdata_proxy_prefix">https://streamdata.motwin.net/</string>
-    <string name="streamdata_app_token">YOUR_STREAMDATA_APP_TOKEN_HERE</string>
+
+    <!--Streamdata.io app token, got from web portal -->
+    <string name="streamdata_app_token">YOUR_STREAMDATA_IO_APP_TOKEN</string>
+
+    <!-- GitHub access token for public utilization
+         this token allows only to read public repos-->
+    <string name="github_public_token">GITHUB_PUBLIC_TOKEN</string>
+
+    <!-- GitHub OAuth client public key  -->
+    <string name="app_client_id">GITHUB_APP_PUBLIC_KEY</string>
+
+    <!-- GitHub OAuth client secret key  -->
+    <string name="app_client_secret">GITHUB_APP_SECRET_KEY</string>
+
+    <!-- Host-URI of LoginActivity Web View -->
+    <string name="redirect_uri">your://redirecturi</string>
+
+    <!-- file that stores history searches (json-file) -->
     <string name="history_filename">searches_history.json</string>
 </resources>

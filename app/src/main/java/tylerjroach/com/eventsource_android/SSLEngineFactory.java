@@ -7,7 +7,9 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 
 public class SSLEngineFactory {
-    SSLEngine GetNewSSLEngine() {
+
+
+  public  SSLEngine GetNewSSLEngine() {
         SSLEngine sslEngine = null;
         SSLContext sslContext;
         try {
