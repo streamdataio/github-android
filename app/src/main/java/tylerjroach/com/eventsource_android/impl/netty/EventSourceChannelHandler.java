@@ -75,8 +75,15 @@ public class EventSourceChannelHandler extends SimpleChannelUpstreamHandler impl
     public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
 
         //URI uri2 = new URI(uri.toString().substring(uri.toString().lastIndexOf("/http")))     ;
+        HttpRequest request;
 
-        HttpRequest request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/"+requestUri.toString());
+        if(requestUri != null){
+            request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/"+requestUri.toString());
+        }
+        else {
+            request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, uri.toString());
+        }
+
         request.addHeader(Names.ACCEPT, "text/event-stream");
 
         if (headers != null) {

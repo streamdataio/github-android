@@ -154,6 +154,7 @@ public class CommitsActivity extends Activity {
             SSEHandler sseHandler = new SSEHandler(api);
             reposEventSources.put(api, new EventSource(new URI(streamdataioProxyPrefix), new URI(myApi), sseHandler, headers));
 
+
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }

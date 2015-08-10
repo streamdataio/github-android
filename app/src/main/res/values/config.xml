@@ -7,17 +7,17 @@
     <string name="streamdata_proxy_prefix">https://streamdata.motwin.net/</string>
 
     <!--Streamdata.io app token, got from web portal -->
-    <string name="streamdata_app_token">YOUR_STREAMDATA_IO_APP_TOKEN</string>
+    <string name="streamdata_app_token">MDM3MzM3OTQtMWRmZC00MTg1LWI2YzEtMGFmYWE1MjlhMmQ3</string>
 
     <!-- GitHub access token for public utilization
          this token allows only to read public repos-->
-    <string name="github_public_token">GITHUB_PUBLIC_TOKEN</string>
+    <string name="github_public_token">687440e1a372051fea33206b0b2dc0dda2f41581</string>
 
     <!-- GitHub OAuth client public key  -->
-    <string name="app_client_id">GITHUB_APP_PUBLIC_KEY</string>
+    <string name="app_client_id">5efd4beff0c473f9c93f</string>
 
     <!-- GitHub OAuth client secret key  -->
-    <string name="app_client_secret">GITHUB_APP_SECRET_KEY</string>
+    <string name="app_client_secret">f554a5011e8ede8e9dc206d353ed86bea2b69697</string>
 
     <!-- Host-URI of LoginActivity Web View -->
     <string name="redirect_uri">your://redirecturi</string>

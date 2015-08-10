@@ -55,6 +55,10 @@ public class EventSource implements EventSourceHandler {
     public EventSource(Executor executor, long reconnectionTimeMillis, final URI pURI, URI requestUri, EventSourceHandler eventSourceHandler, Map<String, String> headers) {
         this(executor, reconnectionTimeMillis, pURI,requestUri,  null, eventSourceHandler, headers);
     }
+    public EventSource(Executor executor, long reconnectionTimeMillis, final URI pURI, EventSourceHandler eventSourceHandler, Map<String, String> headers) {
+        this(executor, reconnectionTimeMillis, pURI, null, eventSourceHandler, headers);
+    }
+
 
     public EventSource(Executor executor, long reconnectionTimeMillis, final URI pURI, URI requestUri, SSLEngineFactory fSSLEngine, EventSourceHandler eventSourceHandler, Map<String, String> headers) {
         this.eventSourceHandler = eventSourceHandler;
@@ -114,6 +118,30 @@ public class EventSource implements EventSourceHandler {
     public EventSource(URI uri, URI requestUri, SSLEngineFactory sslEngineFactory, EventSourceHandler eventSourceHandler, Map<String, String> headers) {
         this(Executors.newSingleThreadExecutor(), DEFAULT_RECONNECTION_TIME_MILLIS, uri, requestUri, sslEngineFactory, eventSourceHandler, headers);
     }
+
+
+
+    public EventSource(String uri, EventSourceHandler eventSourceHandler) {
+        this(uri, null, eventSourceHandler);
+    }
+
+    public EventSource(String uri, SSLEngineFactory sslEngineFactory, EventSourceHandler eventSourceHandler) {
+        this(URI.create(uri), sslEngineFactory, eventSourceHandler);
+    }
+
+    public EventSource(URI uri, EventSourceHandler eventSourceHandler) {
+        this(uri, null, eventSourceHandler);
+    }
+
+
+    public EventSource(URI uri, SSLEngineFactory sslEngineFactory, EventSourceHandler eventSourceHandler) {
+        this(Executors.newSingleThreadExecutor(), DEFAULT_RECONNECTION_TIME_MILLIS, uri, null, sslEngineFactory, eventSourceHandler, null);
+    }
+
+    public EventSource(URI uri, SSLEngineFactory sslEngineFactory, EventSourceHandler eventSourceHandler, Map<String, String> headers) {
+        this(Executors.newSingleThreadExecutor(), DEFAULT_RECONNECTION_TIME_MILLIS, uri, null, sslEngineFactory, eventSourceHandler, headers);
+    }
+
 
     public ChannelFuture connect() {
         readyState = CONNECTING;
