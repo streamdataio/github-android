@@ -270,6 +270,11 @@ public class CommitsActivity extends Activity {
             }
         }
 
+        /**
+         * Create an Android Notification with the given title et content
+         * @param title notification title
+         * @param text notification content text
+         */
         private final void createNotification(String title, String text) {
 
             NotificationCompat.Builder mBuilder =
@@ -289,7 +294,7 @@ public class CommitsActivity extends Activity {
         }
 
         /**
-         * SSE error Handler
+         * SSE error Handler. If the device is not connected to the Internet, all eventsources will be interrupted
          */
         @Override
         public void onError(Throwable t) {
@@ -324,6 +329,9 @@ public class CommitsActivity extends Activity {
         }
     }
 
+    /**
+     * Update the cached commits array. This method should be called on snapshot or patch event.
+     */
     public void updateCommits() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         // Clear commits
@@ -369,6 +377,11 @@ public class CommitsActivity extends Activity {
         });
     }
 
+    /**
+     * Draw a random color in [#000000 .. #E6E6E6]. (about 12 millions outcomes).
+     * Used as text background, the lightest configuration render a white text still readable
+     * @return
+     */
     public int randomColor() {
         Random rnd = new Random();
         return Color.argb(255, rnd.nextInt(230), rnd.nextInt(230), rnd.nextInt(230));

@@ -30,7 +30,8 @@
             android:paddingLeft="20dp"
             android:layout_gravity="center"
             android:hint="Find repositories..."
-            android:textColorHint="#555" />
+            android:textColorHint="#555"
+            android:imeOptions="actionDone" />
 
         <ImageButton
             android:src="@drawable/search_logo"

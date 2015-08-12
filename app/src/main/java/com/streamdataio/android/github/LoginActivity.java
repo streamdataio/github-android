@@ -72,9 +72,6 @@ public class LoginActivity extends Activity {
             settings.edit().clear().commit();
             gitHubLogout();
         }
-
-
-
     }
 
     @Override
@@ -108,6 +105,9 @@ public class LoginActivity extends Activity {
     }
 
 
+    /**
+     * Start Github OAuth Web View
+     */
     public void attemptLogin() {
         SharedPreferences settings = getSharedPreferences("SharedPreferences", Context.MODE_PRIVATE);
         settings.edit().clear().commit();
@@ -118,6 +118,10 @@ public class LoginActivity extends Activity {
         startActivity(intent);
     }
 
+
+    /**
+     * Start Github logout Web View
+     */
     public void gitHubLogout() {
         Intent intent = new Intent(
                 Intent.ACTION_VIEW,
@@ -126,9 +130,11 @@ public class LoginActivity extends Activity {
         startActivity(intent);
     }
 
-
+    /**
+     * Start MainActivity. The used GitHub token parameter is copied in SharedPreferences
+     * @param accessToken
+     */
     private void openMain(String accessToken) {
-
         SharedPreferences sharedPref = getSharedPreferences("SharedPreferences", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("gitHubApiToken", accessToken);

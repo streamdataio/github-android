@@ -18,7 +18,7 @@
 
     <!-- GitHub OAuth client secret key  -->
     <string name="app_client_secret">GITHUB_OAUTH_PRIVATE_KEY</string>
-
+    
     <!-- Host-URI of LoginActivity Web View -->
     <string name="redirect_uri">your://redirecturi</string>
 

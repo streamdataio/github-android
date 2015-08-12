@@ -8,15 +8,18 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
 import android.util.SparseBooleanArray;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.eclipse.egit.github.core.SearchRepository;
@@ -46,6 +49,7 @@ public class MainActivity extends Activity {
 
     /**
      * Android activity creation handler
+     *
      * @param savedInstanceState
      */
     @Override
@@ -62,15 +66,15 @@ public class MainActivity extends Activity {
         // Get GitHub API token
         SharedPreferences sharedPref = getSharedPreferences("SharedPreferences", Context.MODE_PRIVATE);
         gitHubApiToken = sharedPref.getString("gitHubApiToken", "");
-        System.out.println("[MainActivity] gitHubApiToken: "+gitHubApiToken);
+        System.out.println("[MainActivity] gitHubApiToken: " + gitHubApiToken);
 
 
         // If the user is not gitHub-authenticated --> start LoginActivity
-        if(gitHubApiToken.isEmpty()){
+        if (gitHubApiToken.isEmpty()) {
             startLoginActivity();
         }
 
-               // Loading historical searches
+        // Loading historical searches
         history = new SearchHistoryManager(this);
         MAX_CONCURRENT_REPOS = getResources().getInteger(R.integer.concurrent_repositories);
 
@@ -134,6 +138,21 @@ public class MainActivity extends Activity {
             }
         });
 
+
+        // Implicit 'submit' when typing is finished
+        EditText edit_txt = (EditText) findViewById(R.id.searchField);
+        edit_txt.setOnEditorActionListener(new EditText.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    searchAndDisplay(null);
+                    return true;
+                }
+                return false;
+            }
+        });
+
+
         // Authenticating by GitHub Java SDK
         GitHubClient client = new GitHubClient();
         client.setOAuth2Token(gitHubApiToken);
@@ -143,11 +162,19 @@ public class MainActivity extends Activity {
         liste = new ArrayList<>();
     }
 
+    /**
+     * Go back to LoginActivity
+     */
     public void startLoginActivity() {
         Intent inte = new Intent(this, LoginActivity.class);
         startActivity(inte);
     }
 
+    /**
+     * Sign in button handler. Clears sharedPreferences in order not to use the public token anymore, then start LoginActivity with 'SIGN_IN' parameter.
+     *
+     * @param v Sign in entry in menu
+     */
     public void signIn(MenuItem v) {
         SharedPreferences settings = getSharedPreferences("SharedPreferences", Context.MODE_PRIVATE);
         settings.edit().clear().commit();
@@ -157,7 +184,11 @@ public class MainActivity extends Activity {
         startActivity(inte);
     }
 
-    // Call LoginActivity with a signout parameter
+    /**
+     * Call LoginActivity with a 'SIGN_OUT' parameter
+     *
+     * @param v Sign out entry in menu
+     */
     public void signOut(MenuItem v) {
 
         // Display historical searches
@@ -180,37 +211,47 @@ public class MainActivity extends Activity {
         return true;
     }
 
-@Override
-    public boolean onPrepareOptionsMenu(Menu menu){
-    System.err.println("onPrepareOptionsMenu callback");
+    /**
+     * Display the 'Sign-in' menu entry if we are use the public token, 'Sign-out' if the used token is different
+     * @param menu
+     * @return
+     */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        System.err.println("onPrepareOptionsMenu callback");
 
-    // If the user has chosen to use public version
-    if(gitHubApiToken.equals(getResources().getString(R.string.github_public_token))){
-        MenuItem signInButton = menu.findItem(R.id.action_signin);
-        signInButton.setVisible(true);
+        // If the user has chosen to use public version
+        if (gitHubApiToken.equals(getResources().getString(R.string.github_public_token))) {
+            MenuItem signInButton = menu.findItem(R.id.action_signin);
+            signInButton.setVisible(true);
 
-        MenuItem signOutButton = menu.findItem(R.id.action_signout);
-        signOutButton.setVisible(false);
-    }
-    // If the user has chosen to use authenticated api
-    else {
-        MenuItem signInButton = menu.findItem(R.id.action_signin);
-        signInButton.setVisible(false);
+            MenuItem signOutButton = menu.findItem(R.id.action_signout);
+            signOutButton.setVisible(false);
+        }
+        // If the user has chosen to use authenticated api
+        else {
+            MenuItem signInButton = menu.findItem(R.id.action_signin);
+            signInButton.setVisible(false);
 
-        MenuItem signOutButton = menu.findItem(R.id.action_signout);
-        signOutButton.setVisible(true);
-    }
-
+            MenuItem signOutButton = menu.findItem(R.id.action_signout);
+            signOutButton.setVisible(true);
+        }
         return true;
     }
 
-    // Clears search text field on focussing it
+    /**
+     * Clear the main search field
+     *
+     * @param view
+     */
     public void clearField(final View view) {
         EditText editText = (EditText) findViewById(R.id.searchField);
         editText.setText("");
     }
 
-    // Add selected items to history, then start CommitActivity
+    /**
+     * Start the CommitActivity. This procedure adds the selected repositories ID to the searches history
+     */
     public void startCommitActivity(View v) {
         System.out.println(selectedItems);
         for (String item : selectedItems) {
@@ -220,7 +261,10 @@ public class MainActivity extends Activity {
     }
 
 
-    // Clears the list of historical searches
+    /**
+     * Clears the list of historical searches
+     * @param v 'Clear History' menu entry
+     */
     public void clearHistory(MenuItem v) {
         history.resetHistory();
         // Display historical searches
@@ -233,6 +277,10 @@ public class MainActivity extends Activity {
         });
     }
 
+    /**
+     * Lauch the research, handle results and display them in the UI.
+     * @param v
+     */
     public void searchAndDisplay(final View v) {
 
         // Hiding Virtual Keyboard
@@ -248,22 +296,14 @@ public class MainActivity extends Activity {
         try {
             List<SearchRepository> list = service.searchRepositories(searchSentense);
 
-        /*  Map<String, String> searchParams = new HashMap<String, String>();
-            searchParams.put("q", searchSentense);
-            searchParams.put(RepositoryService.FILTER_TYPE, RepositoryService.TYPE_ALL);
-            List<SearchRepository> list = service.searchRepositories(searchParams);
-        */
-
             liste.clear();
             for (SearchRepository repository : list) {
 
-                String repo = "";
-                if (repository.isPrivate()) {
-                    repo += "\uD83D\uDD12";
-                }
+                // Add a Unicode lock if the repo is private, at the begining of the repo name
+               String repo = repository.isPrivate() ? "\uD83D\uDD12" + repository.getId() : repository.getId();
 
-                repo += repository.getId();
-                liste.add( repo );
+                // Push the repo name to the selected repos list
+                liste.add(repo);
             }
             hasResults = !liste.isEmpty();
 
@@ -292,13 +332,16 @@ public class MainActivity extends Activity {
 
         } catch (RequestException e) {
             // GitHub api token may be out-of-date --> restart oauth procedure
-           signIn(null);
+            signIn(null);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Force the keyboard to vanish on click outside the search field
+     */
     public void hideKeyboard() {
         runOnUiThread(new Runnable() {
             @Override
@@ -312,7 +355,6 @@ public class MainActivity extends Activity {
             }
         });
     }
-
 
 
 }
