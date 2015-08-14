@@ -44,7 +44,7 @@ public class MainActivity extends Activity {
     private boolean hasResults = false;
     private ListView listView;
     private Button showButton;
-    public ArrayList<String> liste, selectedItems;
+    public ArrayList<String> list, selectedItems;
     SearchHistoryManager history;
 
     /**
@@ -66,8 +66,6 @@ public class MainActivity extends Activity {
         // Get GitHub API token
         SharedPreferences sharedPref = getSharedPreferences("SharedPreferences", Context.MODE_PRIVATE);
         gitHubApiToken = sharedPref.getString("gitHubApiToken", "");
-        System.out.println("[MainActivity] gitHubApiToken: " + gitHubApiToken);
-
 
         // If the user is not gitHub-authenticated --> start LoginActivity
         if (gitHubApiToken.isEmpty()) {
@@ -159,15 +157,15 @@ public class MainActivity extends Activity {
         service = new RepositoryService(client);
 
         // Instanciate the list of repositories ID as strings
-        liste = new ArrayList<>();
+        list = new ArrayList<>();
     }
 
     /**
      * Go back to LoginActivity
      */
     public void startLoginActivity() {
-        Intent inte = new Intent(this, LoginActivity.class);
-        startActivity(inte);
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
     }
 
     /**
@@ -179,9 +177,9 @@ public class MainActivity extends Activity {
         SharedPreferences settings = getSharedPreferences("SharedPreferences", Context.MODE_PRIVATE);
         settings.edit().clear().commit();
 
-        Intent inte = new Intent(this, LoginActivity.class);
-        inte.putExtra("SIGN_IN", true);
-        startActivity(inte);
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.putExtra("SIGN_IN", true);
+        startActivity(intent);
     }
 
     /**
@@ -190,7 +188,6 @@ public class MainActivity extends Activity {
      * @param v Sign out entry in menu
      */
     public void signOut(MenuItem v) {
-
         // Display historical searches
         runOnUiThread(new Runnable() {
             @Override
@@ -282,45 +279,43 @@ public class MainActivity extends Activity {
      * @param v
      */
     public void searchAndDisplay(final View v) {
-
         // Hiding Virtual Keyboard
         hideKeyboard();
 
-        String searchSentense = ((EditText) findViewById(R.id.searchField)).getText().toString();
-        // If there are no sentense to search: stopping procedure
-        if (searchSentense.isEmpty())
+        String searchSentence = ((EditText) findViewById(R.id.searchField)).getText().toString();
+        // If there are no sentence to search: stopping procedure
+        if (searchSentence.isEmpty())
             return;
 
-        Log.i("info", "SEARCH '" + searchSentense + "'");
+        Log.i("info", "SEARCH '" + searchSentence + "'");
 
         try {
-            List<SearchRepository> list = service.searchRepositories(searchSentense);
+            List<SearchRepository> listRepo = service.searchRepositories(searchSentence);
 
-            liste.clear();
-            for (SearchRepository repository : list) {
-
-                // Add a Unicode lock if the repo is private, at the begining of the repo name
+            this.list.clear();
+            for (SearchRepository repository : listRepo) {
+                // Add a Unicode lock if the repo is private, at the beginning of the repo name
                String repo = repository.isPrivate() ? "\uD83D\uDD12" + repository.getId() : repository.getId();
 
                 // Push the repo name to the selected repos list
-                liste.add(repo);
+                this.list.add(repo);
             }
-            hasResults = !liste.isEmpty();
+            hasResults = !this.list.isEmpty();
 
             // Configure the list view
-            if (!hasResults) liste.add("No result for '" + searchSentense + "'");
+            if (!hasResults) this.list.add("No result for '" + searchSentence + "'");
 
             // Refresh UI
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    ArrayAdapter<String> listAdapter = new ArrayAdapter<>(MainActivity.this, R.layout.single_repo, liste);
+                    ArrayAdapter<String> listAdapter = new ArrayAdapter<>(MainActivity.this, R.layout.single_repo, MainActivity.this.list);
                     listView.setAdapter(listAdapter);
                 }
             });
 
             // Display the search results
-            int numResults = list.size();
+            int numResults = listRepo.size();
             String message = numResults > 99 ? "> 100" : numResults == 0 ? "No" : numResults + "";
             message += " repositories found";
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show();

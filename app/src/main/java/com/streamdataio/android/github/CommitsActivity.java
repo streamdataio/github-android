@@ -152,14 +152,16 @@ public class CommitsActivity extends Activity {
         // Create the EventSource with API URL & Streamdata.io authentication token
         try {
             SSEHandler sseHandler = new SSEHandler(api);
-            reposEventSources.put(api, new EventSource(new URI(streamdataioProxyPrefix), new URI(myApi), sseHandler, headers));
+            EventSource eventSource = new EventSource(new URI(streamdataioProxyPrefix), new URI(myApi), sseHandler, headers);
 
+            reposEventSources.put(api, eventSource);
+
+            // Start data receiving from API
+            eventSource.connect();
 
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-        // Start data receiving from API
-        reposEventSources.get(api).connect();
     }
 
     /**
@@ -232,16 +234,12 @@ public class CommitsActivity extends Activity {
                 // SSE message is a snapshot
                 ownData = mapper.readTree(message.data);
 
-                System.out.println("SIZE DATA : " + message.data.length());
-
                 // Update commits array
                 updateCommits();
 
             } else if ("patch".equals(event)) {
                 // SSE message is a patch
                 try {
-                    System.out.println("SIZE PATCH : " + message.data.length());
-
                     JsonNode patchNode = mapper.readTree(message.data);
                     JsonPatch patch = JsonPatch.fromJson(patchNode);
                     ownData = patch.apply(ownData);

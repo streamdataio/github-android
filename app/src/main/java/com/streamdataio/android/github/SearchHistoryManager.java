@@ -17,7 +17,7 @@ public class SearchHistoryManager {
 
     private static Context context;
 
-    private Set<String> searchesList;
+    private Set<String> searchList;
     private String filename ;
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -39,24 +39,24 @@ public class SearchHistoryManager {
             if (!fileExists(filename)) {
                 resetHistory();
             }
-            searchesList = mapper.readValue(context.openFileInput(filename), Set.class);
+            searchList = mapper.readValue(context.openFileInput(filename), Set.class);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println(searchesList);
+        System.out.println(searchList);
     }
 
     /**
      * Clears the searches history. Reset the file and the cached List of Strings
      */
     public void resetHistory() {
-        List<String> liste = new ArrayList<String>();
-        liste.clear();
+        List<String> list = new ArrayList<String>();
+        list.clear();
         try {
-            mapper.writeValue(context.openFileOutput(filename, Context.MODE_WORLD_WRITEABLE), liste);
-            if (searchesList != null)
-                searchesList.clear();
+            mapper.writeValue(context.openFileOutput(filename, Context.MODE_WORLD_WRITEABLE), list);
+            if (searchList != null)
+                searchList.clear();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -68,8 +68,8 @@ public class SearchHistoryManager {
      */
     public void addSearch(String s) {
         try {
-                searchesList.add(s);
-                mapper.writeValue(context.openFileOutput(filename, Context.MODE_WORLD_WRITEABLE), searchesList);
+                searchList.add(s);
+                mapper.writeValue(context.openFileOutput(filename, Context.MODE_WORLD_WRITEABLE), searchList);
             
         } catch (IOException e) {
             e.printStackTrace();
@@ -81,7 +81,7 @@ public class SearchHistoryManager {
      * @return
      */
     public Set<String> getSearches() {
-        return searchesList;
+        return searchList;
     }
 
 

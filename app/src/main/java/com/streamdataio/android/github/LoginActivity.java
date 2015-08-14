@@ -86,7 +86,8 @@ public class LoginActivity extends Activity {
                 System.err.println("CODE: " + code);
 
                 try {
-                    String result = downloadUrl("https://github.com/login/oauth/access_token?client_id=" + clientId + "&client_secret=" + clientSecret + "&code=" + code);
+                    String result = downloadUrl("https://github.com/login/oauth/access_token?client_id="
+                            + clientId + "&client_secret=" + clientSecret + "&code=" + code);
                     System.out.println(result);
 
                     String accessToken = result.substring(result.indexOf("=")+1, result.indexOf("&"));
@@ -113,7 +114,8 @@ public class LoginActivity extends Activity {
         settings.edit().clear().commit();
         Intent intent = new Intent(
                 Intent.ACTION_VIEW,
-                Uri.parse("https://github.com/login/oauth/authorize?client_id=" + clientId + "&redirect_uri=" + redirectUri+"&scope=repo")
+                Uri.parse("https://github.com/login/oauth/authorize?client_id="
+                        + clientId + "&redirect_uri=" + redirectUri+"&scope=repo")
         );
         startActivity(intent);
     }
