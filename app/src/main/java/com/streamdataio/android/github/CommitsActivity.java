@@ -156,9 +156,6 @@ public class CommitsActivity extends Activity {
 
             reposEventSources.put(api, eventSource);
 
-            // Start data receiving from API
-            eventSource.connect();
-
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -180,10 +177,10 @@ public class CommitsActivity extends Activity {
     private void disconnect(String api) {
         // Disconnect the eventSource Handler
         if (reposEventSources.containsKey(api)) {
-            if (reposEventSources.get(api).isConnected()) {
-                reposEventSources.get(api).close();
+                EventSource e = reposEventSources.get(api);
+                e.close();
                 reposEventSources.remove(api);
-            }
+                e = null;
         }
     }
 
